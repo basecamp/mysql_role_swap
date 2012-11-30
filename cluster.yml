@@ -1,0 +1,17 @@
+database_one:
+  adapter: mysql
+  primary_database: dbname
+  username: root
+  password: XXX
+  host: 10.10.5.82
+  port: 3306
+  slave_password: XXX
+
+database_two:
+  adapter: mysql
+  primary_database: dbname
+  username: root
+  password: XXX
+  host: 10.10.5.83
+  port: 3306
+  slave_password: XXX
