@@ -10,7 +10,7 @@ mysql_role_swap is based on a few key design concepts: The script should be easy
 In April 2011, after planning yet another manual database failover, Taylor shared the use of a statemachine and original design concept with John. One weekend later version one was born and reliably working on some test virtual machines. Since April 2011 John has shepherded the script through multiple rounds of testing in a staging environment. Taylor got the bright idea to add support for moving a virtual IP to the script, and since then the script has been used numerous times in production database environments without issue.
 
 ## Improvements:
-We've designed mysql_role_swap to do work reliably in our environment at [37signals](http://37signals.com) however we believe through wider adoption and contributions from other organizations this script can become even more efficient and reliable. Almost all of the configuration is done by our Chef recipes -- and thus things are a little environment specific right now. With your help we can make this a little less 37-specific.
+We've designed myslq_role_swap to do work reliably in our environment at [37signals](http://37signals.com) however we believe through wider adoption and contributions from other organizations this script can become even more efficient and reliable. Almost all of the configuration is done by our Chef recipes -- and thus things are a little environment specific right now. With your help we can make this a little less 37-specific.
 
 # Getting started
 ### Installation
@@ -47,7 +47,7 @@ Here's a sample cluster.yml:
       primary_database: 37_production
       host: 10.10.9.137
       port: 3306
-      slave_password: IuWeWmaupGkHo0kBZHAK
+      slave_password: iluvsql2
 
     database_two:
       adapter: mysql
@@ -79,7 +79,7 @@ Using the "-d" option:
     Floating IP Role: slave
     MySQL Version: [5.1.45-log]
     Read-Only: true
-    Arping Path: /usr/bin/arping
+    Arping Path: /usr/bin/arpingon:[5.1.45-log] Read-Only: true
 
 
 # Getting help and contributing
