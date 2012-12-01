@@ -1,7 +1,7 @@
 #mysql\_role\_swap
 
 
-mysql_roles_swap is a script written in Ruby to perform all of the tasks that we normally perform when promoting a slave database to master. It performs all of the necessary checks to be sure that the transition is as smooth as possible. It uses the mysql and activerecord libraries to perform these tasks.
+mysql_role_swap is a script written in Ruby to perform all of the tasks that we normally perform when promoting a slave database to master. It performs all of the necessary checks to be sure that the transition is as smooth as possible. It uses the mysql and activerecord libraries to perform these tasks.
 
 ## Design Concepts:
 mysql_role_swap is based on a few key design concepts: The script should be easy to understand and trouble shoot. The script should handle errors gracefully and provide ample data for manual recovery in the event human intervention is needed. We should be deterministic about the state of each step of the failover process.
@@ -10,7 +10,7 @@ mysql_role_swap is based on a few key design concepts: The script should be easy
 In April 2011, after planning yet another manual database failover, Taylor shared the use of a statemachine and original design concept with John. One weekend later version one was born and reliably working on some test virtual machines. Since April 2011 John has shepherded the script through multiple rounds of testing in a staging environment. Taylor got the bright idea to add support for moving a virtual IP to the script, and since then the script has been used numerous times in production database environments without issue.
 
 ## Improvements:
-We've designed myslq_role_swap to do work reliably in our environment at [37signals](http://37signals.com) however we believe through wider adoption and contributions from other organizations this script can become even more efficient and reliable. Almost all of the configuration is done by our Chef recipes -- and thus things are a little environment specific right now. With your help we can make this a little less 37-specific.
+We've designed mysql_role_swap to do work reliably in our environment at [37signals](http://37signals.com) however we believe through wider adoption and contributions from other organizations this script can become even more efficient and reliable. Almost all of the configuration is done by our Chef recipes -- and thus things are a little environment specific right now. With your help we can make this a little less 37-specific.
 
 # Getting started
 ### Installation
