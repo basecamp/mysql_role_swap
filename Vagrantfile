@@ -9,18 +9,11 @@ Vagrant::Config.run do |config|
   # Boot with a GUI so you can see the screen. (Default is headless)
   #config.vm.boot_mode = :gui
 
-  #
-  # Shared folders
-  #
-  #config.vm.share_folder("vagrant-configs", "/tmp/vagrant-configs", "vagrant-configs")
-
 
   #
   # Provisioning
   #
-  config.vm.provision :shell, :inline => 'rpm -q --quiet mysql-server || yum install -y mysql-server'                              # Install mysql-server if it does not exist
-  config.vm.provision :shell, :inline => 'service mysqld status >> /dev/null || service mysqld start'                              # Start mysqld if it is not running
-  #config.vm.provision :shell, :inline => 'mysql -u root -p rootpw -e "SHOW MASTER STATUS" || mysqladmin -u root password rootpw'  # Set root's password
+  config.vm.provision :shell, :path => 'vagrant-configs/setup.sh'
 
 
   #
