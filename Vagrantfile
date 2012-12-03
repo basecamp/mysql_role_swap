@@ -11,24 +11,18 @@ Vagrant::Config.run do |config|
 
 
   #
-  # Provisioning
-  #
-  config.vm.provision :shell, :path => 'vagrant-configs/setup.sh'
-
-
-  #
   # Targets
   #
   config.vm.define :mysql1 do |target_config|
     target_config.vm.host_name = 'test-mysql-1'
     target_config.vm.network :hostonly, "192.168.50.31"
-    target_config.vm.provision :shell, :inline => 'if [ ! -L /etc/my.cnf ]; then rm -f /etc/my.cnf && ln -s /vagrant/vagrant-configs/master.cnf /etc/my.cnf && service mysqld restart ; fi'
+    target_config.vm.provision :shell, :path => 'vagrant-configs/setup.sh', :args => "master"
   end
 
   config.vm.define :mysql2 do |target_config|
     target_config.vm.host_name = 'test-mysql-2'
     target_config.vm.network :hostonly, "192.168.50.32"
-    target_config.vm.provision :shell, :inline => 'if [ ! -L /etc/my.cnf ]; then rm -f /etc/my.cnf && ln -s /vagrant/vagrant-configs/slave.cnf /etc/my.cnf && service mysqld restart ; fi'
+    target_config.vm.provision :shell, :path => 'vagrant-configs/setup.sh', :args => "slave"
   end
 end
 

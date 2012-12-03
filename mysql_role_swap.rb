@@ -113,9 +113,9 @@ class DatabaseOne < ActiveRecord::Base
     CONFIG[database]
   end
 
-  def self.vip_interface
-    if CONFIG['vip_interface']
-      CONFIG['vip_interface']
+  def self.floating_dev
+    if self.config['floating_dev']
+      self.config['floating_dev']
     else
       "bond0"
     end
@@ -148,9 +148,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.add_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
+     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}`
     else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}'`
    end
    if $?.exitstatus == 0
     true
@@ -161,9 +161,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.remove_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
+     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}'`
    end
    if $?.exitstatus == 0
     true
@@ -185,9 +185,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -229,6 +229,16 @@ class DatabaseOne < ActiveRecord::Base
     end
   end
 
+  def self.print_info
+    printf "%-22s: %s:%d\n", self.role.capitalize, self.hostname, self.config['port']
+    puts "MySQL Replication Role: #{self.mysql_rep_role}"
+    puts "Floating IP Role      : #{self.ip_role}"
+    puts "Floating IP Interface : #{self.floating_dev}"
+    puts "MySQL Version         : [#{self.version}]"
+    puts "Read-Only             : #{self.read_only?}"
+    puts "Arping Path           : #{self.arping_path}\n\n"
+  end
+
 end
 
 class DatabaseTwo < ActiveRecord::Base
@@ -243,9 +253,9 @@ class DatabaseTwo < ActiveRecord::Base
     CONFIG[database]
   end
 
-  def self.vip_interface
-    if CONFIG['vip_interface']
-      CONFIG['vip_interface']
+  def self.floating_dev
+    if self.config['floating_dev']
+      self.config['floating_dev']
     else
       "bond0"
     end
@@ -277,9 +287,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.add_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
+     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}`
     else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}'`
    end
    if $?.exitstatus == 0
     true
@@ -290,9 +300,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.remove_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
+     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.floating_dev}'`
    end
    if $?.exitstatus == 0
     true
@@ -314,9 +324,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{slef.vip_interface} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{slef.floating_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -358,6 +368,16 @@ class DatabaseTwo < ActiveRecord::Base
     end
   end
 
+  def self.print_info
+    printf "%-22s: %s:%d\n", self.role.capitalize, self.hostname, self.config['port']
+    puts "MySQL Replication Role: #{self.mysql_rep_role}"
+    puts "Floating IP Role      : #{self.ip_role}"
+    puts "Floating IP Interface : #{self.floating_dev}"
+    puts "MySQL Version         : [#{self.version}]"
+    puts "Read-Only             : #{self.read_only?}"
+    puts "Arping Path           : #{self.arping_path}\n\n"
+  end
+
 end
 
 class MysqlSwitchRoleContext
@@ -381,15 +401,8 @@ class MysqlSwitchRoleContext
 
     databases.sort {|x,y| x.role <=> y.role}.each do |db|
       begin
+        db.print_info
 
-        #puts "#{db.role.capitalize}:".white + " #{db.hostname}:#{db.config['port']}"
-        printf "%-22s: %s:%d\n", db.role.capitalize, db.hostname, db.config['port']
-        puts "MySQL Replication Role: #{db.mysql_rep_role}"
-        puts "Floating IP Role      : #{db.ip_role}"
-        puts "Floating IP Interface : #{db.vip_interface}"
-        puts "MySQL Version         : [#{db.version}]"
-        puts "Read-Only             : #{db.read_only?}"
-        puts "Arping Path           : #{db.arping_path}\n\n"
         if db.role == "slave"
           unless @slave
             @slave = db
@@ -654,12 +667,7 @@ class MysqlSwitchRoleContext
     databases = [DatabaseOne, DatabaseTwo]
     databases.sort {|x,y| x.role <=> y.role}.each do |db|
       begin
-
-        puts "#{db.role.capitalize}:".white + " #{db.hostname}:#{db.config['port']}"
-        puts "MySQL Replication Role: #{db.mysql_rep_role}"
-        puts "Floating IP Role: #{db.ip_role}"
-        puts "MySQL Version: [#{db.version}]"
-        puts "Read-Only: #{db.read_only?}\n\n"
+        db.print_info
       rescue
       end
     end

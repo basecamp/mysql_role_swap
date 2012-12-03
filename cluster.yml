@@ -13,7 +13,7 @@ database_one:
   host: 192.168.50.31
   port: 3306
   slave_password: slavepw
-  vip_interface: eth1
+  floating_dev: eth1
 
 database_two:
   adapter: mysql
@@ -23,5 +23,5 @@ database_two:
   host: 192.168.50.32
   port: 3306
   slave_password: slavepw
-  vip_interface: eth1
+  floating_dev: eth1
 
