@@ -1,17 +1,22 @@
+floating_ip: 192.168.50.30
+floating_ip_cidr: /32
+master_ipmi_address: 192.168.51.30
+
 database_one:
   adapter: mysql
-  primary_database: dbname
+  primary_database: test
   username: root
-  password: XXX
-  host: 10.10.5.82
+#  password: rootpw
+  host: 192.168.50.31
   port: 3306
-  slave_password: XXX
+  slave_password: slavepw
 
 database_two:
   adapter: mysql
-  primary_database: dbname
+  primary_database: test
   username: root
-  password: XXX
-  host: 10.10.5.83
+#  password: rootpw
+  host: 192.168.50.32
   port: 3306
-  slave_password: XXX
+  slave_password: slavepw
+
