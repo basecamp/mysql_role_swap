@@ -66,7 +66,7 @@ Choice.options do
     desc 'Show version'
     action do
       puts "MySQL Role Swap v#{PROGRAM_VERSION}"
-      exit      
+      exit
     end
   end
 end
@@ -199,7 +199,7 @@ class DatabaseOne < ActiveRecord::Base
  def self.hostname
     `host #{self.config['host']}`.split(" ").last.gsub(/.\Z/, "").split(".").first
   end
- 
+
 end
 
 class DatabaseTwo < ActiveRecord::Base
@@ -416,7 +416,7 @@ class MysqlSwitchRoleContext
        puts "MySQL Configuration....Fail. The read/write states of the master or slave are wrong.".red
        @statemachine.bad_config
        exit EXIT_WARNING
-    end 
+    end
   end
 
   def check_replicaton
@@ -472,7 +472,7 @@ class MysqlSwitchRoleContext
   def set_read_only
     if @master
       @master.connection.execute("SET GLOBAL read_only = ON")
-      puts "Set Master to Read-Only....OK"    
+      puts "Set Master to Read-Only....OK"
       @statemachine.verify_master_binlog_position
     else
       puts "Set Master to Read-Only....DOWN"
