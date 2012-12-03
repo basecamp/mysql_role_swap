@@ -6,4 +6,5 @@ gem 'activerecord'
 gem 'statemachine'
 gem 'colorize'
 gem 'choice'
+gem 'vagrant'
 
