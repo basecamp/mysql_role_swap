@@ -2,9 +2,11 @@ source "http://rubygems.org"
 
 gem 'mysql', '2.8.1'
 gem 'activerecord'
-#gem 'activerecord-mysql-adapter'
 gem 'statemachine'
 gem 'colorize'
 gem 'choice'
-gem 'vagrant'
+
+group :development do
+  gem 'vagrant'
+end
 
