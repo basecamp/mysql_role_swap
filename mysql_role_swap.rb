@@ -83,6 +83,19 @@ FLOATING_IP = CONFIG['floating_ip']
 FLOATING_IP_CIDR = CONFIG['floating_ip_cidr']
 MASTER_IPMI_ADDRESS = CONFIG['master_ipmi_address']
 
+if CONFIG['ssh_username']
+  SSH_USERNAME = "-l #{CONFIG['ssh_username']}"
+else
+  SSH_USERNAME = ""
+end
+if CONFIG['ssh_key_file']
+  SSH_KEY_FILE = "-i #{CONFIG['ssh_key_file']}"
+else
+  SSH_KEY_FILE = ""
+end
+SSH_OPTIONS = "#{SSH_USERNAME} #{SSH_KEY_FILE}"
+
+
 ActiveRecord::Base.configurations = CONFIG
 
 class DatabaseOne < ActiveRecord::Base
@@ -95,6 +108,14 @@ class DatabaseOne < ActiveRecord::Base
 
   def self.config
     CONFIG[database]
+  end
+
+  def self.vip_interface
+    if CONFIG['vip_interface']
+      CONFIG['vip_interface']
+    else
+      "bond0"
+    end
   end
 
   def self.role
@@ -114,7 +135,7 @@ class DatabaseOne < ActiveRecord::Base
  end
 
  def self.ip_role
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr | grep #{FLOATING_IP}#{FLOATING_IP_CIDR}'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr | grep #{FLOATING_IP}#{FLOATING_IP_CIDR}'`
    if $?.exitstatus == 0
     "master"
   else
@@ -124,9 +145,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.add_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0`
+     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
     else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
    end
    if $?.exitstatus == 0
     true
@@ -137,9 +158,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.remove_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0`
+     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
    else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
    end
    if $?.exitstatus == 0
     true
@@ -149,11 +170,11 @@ class DatabaseOne < ActiveRecord::Base
  end
 
  def self.arping_path
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/arping -V 2> /dev/null'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/arping -V 2> /dev/null'`
    if $?.exitstatus == 0
      return "/sbin/arping"
    end
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /usr/bin/arping -V 2> /dev/null'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /usr/bin/arping -V 2> /dev/null'`
    if $?.exitstatus == 0
      return "/usr/bin/arping"
    end
@@ -161,9 +182,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I bond0 #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}`
    else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo #{self.arping_path} -U -c 4 -I bond0 #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -197,7 +218,12 @@ class DatabaseOne < ActiveRecord::Base
  end
 
  def self.hostname
-    `host #{self.config['host']}`.split(" ").last.gsub(/.\Z/, "").split(".").first
+    name = `host #{self.config['host']}`
+    if $?.exitstatus == 0
+      name.split(" ").last.gsub(/.\Z/, "").split(".").first
+    else
+      self.config['host']
+    end
   end
 
 end
@@ -214,6 +240,13 @@ class DatabaseTwo < ActiveRecord::Base
     CONFIG[database]
   end
 
+  def self.vip_interface
+    if CONFIG['vip_interface']
+      CONFIG['vip_interface']
+    else
+      "bond0"
+    end
+  end
   def self.role
    if self.mysql_rep_role == "master" && self.ip_role == "master"
     "master"
@@ -231,7 +264,7 @@ class DatabaseTwo < ActiveRecord::Base
  end
 
  def self.ip_role
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr | grep -q #{FLOATING_IP}#{FLOATING_IP_CIDR}'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr | grep -q #{FLOATING_IP}#{FLOATING_IP_CIDR}'`
    if $?.exitstatus == 0
     "master"
   else
@@ -241,9 +274,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.add_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0`
+     `sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
     else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr add #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
    end
    if $?.exitstatus == 0
     true
@@ -254,9 +287,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.remove_vip
    if self.config['host'] == `hostname`.chomp
-     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0`
+     `sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}`
    else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev bond0'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/ip addr del #{FLOATING_IP}#{FLOATING_IP_CIDR} dev #{self.vip_interface}'`
    end
    if $?.exitstatus == 0
     true
@@ -266,11 +299,11 @@ class DatabaseTwo < ActiveRecord::Base
  end
 
  def self.arping_path
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /sbin/arping -V 2> /dev/null'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /sbin/arping -V 2> /dev/null'`
    if $?.exitstatus == 0
      return "/sbin/arping"
    end
-   `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo /usr/bin/arping -V 2> /dev/null'`
+   `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo /usr/bin/arping -V 2> /dev/null'`
    if $?.exitstatus == 0
      return "/usr/bin/arping"
    end
@@ -278,9 +311,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I bond0 #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{slef.vip_interface} #{FLOATING_IP}`
    else
-     `ssh app@#{self.config['host']} -i /local/app/.ssh/id_rsa 'sudo #{self.arping_path} -U -c 4 -I bond0 #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.vip_interface} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -314,7 +347,12 @@ class DatabaseTwo < ActiveRecord::Base
  end
 
  def self.hostname
-    `host #{self.config['host']}`.split(" ").last.gsub(/.\Z/, "").split(".").first
+    name = `host #{self.config['host']}`
+    if $?.exitstatus == 0
+      name.split(" ").last.gsub(/.\Z/, "").split(".").first
+    else
+      self.config['host']
+    end
   end
 
 end
@@ -336,17 +374,19 @@ class MysqlSwitchRoleContext
     # Gather info.
     databases = [DatabaseOne, DatabaseTwo]
     puts "\nCurrent Cluster Configuration:\n\n".white
-    puts "Floating IP: ".white + FLOATING_IP + "\n\n"
+    puts "Floating IP           : ".white + FLOATING_IP + "\n\n"
 
     databases.sort {|x,y| x.role <=> y.role}.each do |db|
       begin
 
-        puts "#{db.role.capitalize}:".white + " #{db.hostname}:#{db.config['port']}"
+        #puts "#{db.role.capitalize}:".white + " #{db.hostname}:#{db.config['port']}"
+        printf "%-22s: %s:%d\n", db.role.capitalize, db.hostname, db.config['port']
         puts "MySQL Replication Role: #{db.mysql_rep_role}"
-        puts "Floating IP Role: #{db.ip_role}"
-        puts "MySQL Version: [#{db.version}]"
-        puts "Read-Only: #{db.read_only?}"
-        puts "Arping Path: #{db.arping_path}\n\n"
+        puts "Floating IP Role      : #{db.ip_role}"
+        puts "Floating IP Interface : #{db.vip_interface}"
+        puts "MySQL Version         : [#{db.version}]"
+        puts "Read-Only             : #{db.read_only?}"
+        puts "Arping Path           : #{db.arping_path}\n\n"
         if db.role == "slave"
           unless @slave
             @slave = db

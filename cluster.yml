@@ -2,6 +2,9 @@ floating_ip: 192.168.50.30
 floating_ip_cidr: /32
 master_ipmi_address: 192.168.51.30
 
+ssh_username: vagrant
+ssh_key_file: ~/.vagrant.d/insecure_private_key
+
 database_one:
   adapter: mysql
   primary_database: test
@@ -10,6 +13,7 @@ database_one:
   host: 192.168.50.31
   port: 3306
   slave_password: slavepw
+  vip_interface: eth1
 
 database_two:
   adapter: mysql
@@ -19,4 +23,5 @@ database_two:
   host: 192.168.50.32
   port: 3306
   slave_password: slavepw
+  vip_interface: eth1
 
