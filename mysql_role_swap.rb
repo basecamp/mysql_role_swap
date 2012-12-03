@@ -75,8 +75,11 @@ CHOICES = Choice.choices
 
 if CHOICES[:database]
   CONFIG = YAML::load(IO.read("#{MYSQL_BASE_PATH}/#{CHOICES[:database].downcase}/config/cluster.yml"))
-else
+elsif CHOICES[:config]
   CONFIG = YAML::load(IO.read(CHOICES[:config]))
+else
+  puts "Usage: #{File.basename(__FILE__)} { -c config_file | -d database_name } [-fsv]"
+  exit EXIT_WARNING
 end
 
 FLOATING_IP = CONFIG['floating_ip']
