@@ -4,7 +4,7 @@
 mysql_role_swap is a script written in Ruby to perform all of the tasks that we normally perform when promoting a slave database to master. It performs all of the necessary checks to be sure that the transition is as smooth as possible. It uses the mysql and activerecord libraries to perform these tasks.
 
 ## Design Concepts:
-mysql_role_swap is based on a few key design concepts: The script should be easy to understand and trouble shoot. The script should handle errors gracefully and provide ample data for manual recovery in the event human intervention is needed. We should be deterministic about the state of each step of the failover process.
+mysql_role_swap is based on a few key design concepts: The script should be easy to understand and troubleshoot. The script should handle errors gracefully and provide ample data for manual recovery in the event human intervention is needed. We should be deterministic about the state of each step of the failover process.
 
 ## History:
 In April 2011, after planning yet another manual database failover, Taylor shared the use of a statemachine and original design concept with John. One weekend later version one was born and reliably working on some test virtual machines. Since April 2011 John has shepherded the script through multiple rounds of testing in a staging environment. Taylor got the bright idea to add support for moving a virtual IP to the script, and since then the script has been used numerous times in production database environments without issue.
@@ -32,7 +32,7 @@ Optional options:
 * Force (-f): The force option will not prompt you before failing over the database. If there is a configuration problem the failover will not proceed. (use carefully)
 
 
-You also need a cluster.yml file so the script can do all it's magic correctly.
+You also need a cluster.yml file so the script can do all its magic correctly.
 
 Here's a sample cluster.yml:
 
