@@ -19,9 +19,14 @@ service iptables stop 2>&1 >> /dev/null
 echo "Verifying mysql server is installed..."
 rpm -q --quiet mysql-server || yum install -y mysql-server
 
+# Cleanup any old replication settings
+echo "Cleaning up old mysql instance..."
+service mysqld stop 2>&1 > /dev/null
+rm -rf /var/lib/mysql/*
+
 # Start mysqld
 echo "Verifying mysqld is running..."
-service mysqld status 2>&1 >> /dev/null || service mysqld start 2>&1 >> /dev/null
+service mysqld status 2>&1 >> /dev/null || service mysqld start 2>&1 > /dev/null
 
 # MySQL user setup
 echo "Granting remote root access..."
@@ -51,7 +56,11 @@ if [ "${ROLE}" == "slave" ]; then
 fi
 
 if [ "${ROLE}" == "master" ]; then
-  echo "Installing Floating VIP ${FLOATING_UP}..."
-  /sbin/ip addr add ${FLOATING_IP} dev ${FLOATING_DEV}
+  echo "Checking for Floating VIP..."
+  /sbin/ip addr list | grep "${FLOATING_IP}" 2>&1 > /dev/null
+  if [  $? == 1 ]; then
+    echo "Installing Floating VIP ${FLOATING_IP}..."
+    /sbin/ip addr add ${FLOATING_IP} dev ${FLOATING_DEV}
+  fi
 fi
 
