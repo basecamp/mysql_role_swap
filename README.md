@@ -24,7 +24,7 @@ The script has been deployed on all of our database servers. And it is located a
 
 When running the script you must specify at least one of the following options:
 
-* Database Instance Name (-d): The name of the MySQL instance that you are swapping roles on. (This is used create the path to the cluster.yml file)
+* Database Instance Name (-d): The name of the MySQL instance that you are swapping roles on. (This is used to create the path to the cluster.yml file)
 * Full Config Path (-c): Full path to the cluster.yml file.
 
 Optional options:
