@@ -1,4 +1,4 @@
-source "http://rubygems.org"
+source "https://rubygems.org"
 
 gem 'mysql', '2.8.1'
 gem 'activerecord'
