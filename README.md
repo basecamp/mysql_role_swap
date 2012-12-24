@@ -79,7 +79,7 @@ Using the "-d" option:
     Floating IP Role: slave
     MySQL Version: [5.1.45-log]
     Read-Only: true
-    Arping Path: /usr/bin/arpingon:[5.1.45-log] Read-Only: true
+    Arping Path: /usr/bin/arping
 
 
 # Getting help and contributing
