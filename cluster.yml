@@ -1,3 +1,9 @@
+floating_ip: 10.10.10.37
+floating_ip_cidr: /32
+master_ipmi_address: 10.10.99.137
+ssh_user: app # defaults: app
+ssh_identity_file: /local/app/.ssh/id_rsa # defaults: /local/app/.ssh/id_rsa, NULL to disable it
+
 database_one:
   adapter: mysql
   primary_database: dbname
@@ -5,6 +11,7 @@ database_one:
   password: XXX
   host: 10.10.5.82
   port: 3306
+  slave_user: slave
   slave_password: XXX
 
 database_two:
@@ -14,4 +21,5 @@ database_two:
   password: XXX
   host: 10.10.5.83
   port: 3306
+  slave_user: slave
   slave_password: XXX
