@@ -2,7 +2,7 @@
 #
 # MySQL Switch Roles
 # Copyright 37signals, 2012
-# Authors: John Williams (john@37signals.com), Taylor Weibley (taylor@37signals.com), Matthew Kent (matthew@37signals.com)
+# Authors: John Williams (john@37signals.com), Taylor Weibley (taylor@37signals.com), Matthew Kent (matthew@37signals.com), Jean-Francois Theroux (failshell@gmail.com)
 
 require 'rubygems'
 require 'mysql'
@@ -11,9 +11,9 @@ require 'statemachine'
 require 'colorize'
 require 'choice'
 
-PROGRAM_VERSION = "0.12"
+PROGRAM_VERSION = "0.12.1"
 
-MYSQL_BASE_PATH = "/u/mysql"
+MYSQL_BASE_PATH = "/etc"
 
 FORCE = false
 
