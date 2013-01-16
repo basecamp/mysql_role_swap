@@ -567,7 +567,7 @@ class MysqlSwitchRoleContext
 
     puts "\nSlave (master-to-be) binlog info:".white
     puts "\nPosition....#{@slave_binlog_position}\nFile....#{@slave_binlog_file}"
-    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='slave', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
+    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='#{@slave.config['username']}', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
     @statemachine.promote_slave_to_master
   end
 
