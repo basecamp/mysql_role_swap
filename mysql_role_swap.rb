@@ -13,7 +13,7 @@ require 'choice'
 
 PROGRAM_VERSION = "0.12.1"
 
-MYSQL_BASE_PATH = "/etc"
+CFG_BASE_PATH = "/etc"
 
 FORCE = false
 
@@ -74,7 +74,7 @@ end
 CHOICES = Choice.choices
 
 if CHOICES[:database]
-  CONFIG = YAML::load(IO.read("#{MYSQL_BASE_PATH}/#{CHOICES[:database].downcase}/config/cluster.yml"))
+  CONFIG = YAML::load(IO.read("#{CFG_BASE_PATH}/cluster.yml"))
 elsif CHOICES[:config]
   CONFIG = YAML::load(IO.read(CHOICES[:config]))
 else
