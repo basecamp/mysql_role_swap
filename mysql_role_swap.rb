@@ -121,6 +121,14 @@ class DatabaseOne < ActiveRecord::Base
     end
   end
 
+  def self.master_dev
+    if self.config['master_dev']
+      self.config['master_dev']
+    else
+      self.floating_dev
+    end
+  end
+
   def self.role
    if self.mysql_rep_role == "master" && self.ip_role == "master"
     "master"
@@ -185,9 +193,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -260,6 +268,15 @@ class DatabaseTwo < ActiveRecord::Base
       "bond0"
     end
   end
+  
+  def self.master_dev
+    if self.config['master_dev']
+      self.config['master_dev']
+    else
+      self.floating_dev
+    end
+  end
+
   def self.role
    if self.mysql_rep_role == "master" && self.ip_role == "master"
     "master"
@@ -324,9 +341,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{slef.floating_dev} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{slef.master_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
