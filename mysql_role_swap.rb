@@ -590,7 +590,7 @@ class MysqlSwitchRoleContext
 
   def promote_slave_to_master
     @slave.connection.execute("STOP SLAVE;")
-    if @slave.version =~ /^5.5/
+    if @slave.version =~ /(^5.5|^10.0)/
       @slave.connection.execute("RESET SLAVE ALL;")
     else
       @slave.connection.execute("CHANGE MASTER TO master_host='';")
