@@ -12,15 +12,34 @@ GEM
     activesupport (3.2.9)
       i18n (~> 0.6)
       multi_json (~> 1.0)
+    archive-tar-minitar (0.5.2)
     arel (3.0.2)
     builder (3.0.4)
+    childprocess (0.3.6)
+      ffi (~> 1.0, >= 1.0.6)
     choice (0.1.6)
     colorize (0.5.8)
+    erubis (2.7.0)
+    ffi (1.2.0)
     i18n (0.6.1)
+    json (1.5.4)
+    log4r (1.1.10)
     multi_json (1.4.0)
     mysql (2.8.1)
+    net-scp (1.0.4)
+      net-ssh (>= 1.99.1)
+    net-ssh (2.2.2)
     statemachine (2.0.1)
     tzinfo (0.3.35)
+    vagrant (1.0.5)
+      archive-tar-minitar (= 0.5.2)
+      childprocess (~> 0.3.1)
+      erubis (~> 2.7.0)
+      i18n (~> 0.6.0)
+      json (~> 1.5.1)
+      log4r (~> 1.1.9)
+      net-scp (~> 1.0.4)
+      net-ssh (~> 2.2.2)
 
 PLATFORMS
   ruby
@@ -31,3 +50,4 @@ DEPENDENCIES
   colorize
   mysql (= 2.8.1)
   statemachine
+  vagrant

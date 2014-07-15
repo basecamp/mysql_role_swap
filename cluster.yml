@@ -1,25 +1,27 @@
-floating_ip: 10.10.10.37
+floating_ip: 192.168.50.30
 floating_ip_cidr: /32
-master_ipmi_address: 10.10.99.137
-ssh_user: app # defaults: app
-ssh_identity_file: /local/app/.ssh/id_rsa # defaults: /local/app/.ssh/id_rsa, NULL to disable it
+master_ipmi_address: 192.168.51.30
+
+ssh_username: vagrant
+ssh_key_file: ~/.vagrant.d/insecure_private_key
 
 database_one:
   adapter: mysql
-  primary_database: dbname
+  primary_database: test
   username: root
-  password: XXX
-  host: 10.10.5.82
+#  password: rootpw
+  host: 192.168.50.31
   port: 3306
-  slave_user: slave
-  slave_password: XXX
+  slave_password: slavepw
+  floating_dev: eth1
 
 database_two:
   adapter: mysql
-  primary_database: dbname
+  primary_database: test
   username: root
-  password: XXX
-  host: 10.10.5.83
+#  password: rootpw
+  host: 192.168.50.32
   port: 3306
-  slave_user: slave
-  slave_password: XXX
+  slave_password: slavepw
+  floating_dev: eth1
+
