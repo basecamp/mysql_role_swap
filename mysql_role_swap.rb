@@ -85,20 +85,6 @@ end
 FLOATING_IP = CONFIG['floating_ip']
 FLOATING_IP_CIDR = CONFIG['floating_ip_cidr']
 MASTER_IPMI_ADDRESS = CONFIG['master_ipmi_address']
-SSH_USER = CONFIG['ssh_user']
-if not SSH_USER then
-    SSH_USER = 'app'
-end
-if CONFIG.has_key?("ssh_identity_file") then
-    SSH_IDENTITY_FILE = CONFIG['ssh_identity_file']
-else
-    SSH_IDENTITY_FILE = '/local/app/.ssh/id_rsa'
-end
-if SSH_IDENTITY_FILE == nil then
-    SSH_OPTIONS = ""
-else
-    SSH_OPTIONS = "-i #{SSH_IDENTITY_FILE}"
-end
 
 if CONFIG['ssh_username']
   SSH_USERNAME = "-l #{CONFIG['ssh_username']}"
@@ -581,7 +567,7 @@ class MysqlSwitchRoleContext
 
     puts "\nSlave (master-to-be) binlog info:".white
     puts "\nPosition....#{@slave_binlog_position}\nFile....#{@slave_binlog_file}"
-    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='#{@slave.config['slave_user']}', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
+    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='slave', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
     @statemachine.promote_slave_to_master
   end
 
@@ -627,7 +613,7 @@ class MysqlSwitchRoleContext
   end
 
   def demote_old_master_to_slave
-    change_master_command = "CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='#{@slave.config['slave_user']}', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}"
+    change_master_command = "CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='slave', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}"
     if @master
       @master.connection.execute(change_master_command)
       @master.connection.execute("START SLAVE")
