@@ -505,7 +505,7 @@ class MysqlSwitchRoleContext
   end
 
   def generate_curl(host, action = "disable", verbose = false)
-    "curl #{verbose ? '-v ' : ''} http://#{INTERMISSION_USER}:#{INTERMISSION_PASSWORD}@#{host}/_intermission/#{action}"
+    "curl #{verbose ? '-v ' : ''} --silent http://#{INTERMISSION_USER}:#{INTERMISSION_PASSWORD}@#{host}/_intermission/#{action}"
   end
 
   def pause_traffic
