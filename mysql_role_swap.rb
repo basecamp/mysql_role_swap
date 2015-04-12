@@ -86,6 +86,11 @@ FLOATING_IP = CONFIG['floating_ip']
 FLOATING_IP_CIDR = CONFIG['floating_ip_cidr']
 MASTER_IPMI_ADDRESS = CONFIG['master_ipmi_address']
 
+APPLICATION_HOSTS = CONFIG['intermission']['app_hosts']
+INTERMISSION_USER = CONFIG['intermission']['userid']
+INTERMISSION_PASSWORD = CONFIG['intermission']['password']
+INTERMISSION_MONITOR_HOST = CONFIG['intermission']['monitor_host']
+
 if CONFIG['ssh_username']
   SSH_USERNAME = "-l #{CONFIG['ssh_username']}"
 else
@@ -499,10 +504,16 @@ class MysqlSwitchRoleContext
     end
   end
 
+  def generate_curl(host, action = "disable", verbose = false)
+    "curl #{verbose ? '-v ' : ''} http://#{INTERMISSION_USER}:#{INTERMISSION_PASSWORD}@#{host}/_intermission/#{action}"
+  end
+
   def pause_traffic
-    `touch /tmp/hold`
+    APPLICATION_HOSTS.each do |host|
+      `#{generate_curl(host, "enable")}`
+    end
     sleep 1
-    puts "Paused proxy traffic....OK"
+    puts "Paused traffic via Intermission....OK"
     @statemachine.traffic_paused
   end
 
@@ -606,9 +617,11 @@ class MysqlSwitchRoleContext
   end
 
   def unpause_traffic
-    `rm -rf /tmp/hold`
+    APPLICATION_HOSTS.each do |host|
+      `#{generate_curl(host, "disable")}`
+    end
     sleep 1
-    puts "Unpaused proxy traffic....OK"
+    puts "Unpaused traffic via Intermission....OK"
     @statemachine.traffic_unpaused
   end
 
