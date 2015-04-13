@@ -512,7 +512,6 @@ class MysqlSwitchRoleContext
     APPLICATION_HOSTS.each do |host|
       `#{generate_curl(host, "enable")}`
     end
-    sleep 1
     puts "Paused traffic via Intermission....OK"
     @statemachine.traffic_paused
   end
@@ -620,7 +619,6 @@ class MysqlSwitchRoleContext
     APPLICATION_HOSTS.each do |host|
       `#{generate_curl(host, "disable")}`
     end
-    sleep 1
     puts "Unpaused traffic via Intermission....OK"
     @statemachine.traffic_unpaused
   end
