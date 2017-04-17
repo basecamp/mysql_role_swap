@@ -1,4 +1,4 @@
-#mysql\_role\_swap
+# mysql\_role\_swap
 
 
 mysql_role_swap is a script written in Ruby to perform all of the tasks that we normally perform when promoting a slave database to master. It performs all of the necessary checks to be sure that the transition is as smooth as possible. It uses the mysql and activerecord libraries to perform these tasks.
