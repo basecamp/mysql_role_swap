@@ -2,7 +2,7 @@
 #
 # MySQL Switch Roles
 # Copyright 37signals, 2012
-# Authors: John Williams (john@37signals.com), Taylor Weibley (taylor@37signals.com), Matthew Kent (matthew@37signals.com)
+# Authors: John Williams (john@37signals.com), Taylor Weibley (taylor@37signals.com), Matthew Kent (matthew@37signals.com), Jean-Francois Theroux (failshell@gmail.com)
 
 require 'rubygems'
 require 'mysql'
@@ -11,9 +11,9 @@ require 'statemachine'
 require 'colorize'
 require 'choice'
 
-PROGRAM_VERSION = "0.12"
+PROGRAM_VERSION = "0.12.1"
 
-MYSQL_BASE_PATH = "/u/mysql"
+CFG_BASE_PATH = "/etc"
 
 FORCE = false
 
@@ -74,7 +74,7 @@ end
 CHOICES = Choice.choices
 
 if CHOICES[:database]
-  CONFIG = YAML::load(IO.read("#{MYSQL_BASE_PATH}/#{CHOICES[:database].downcase}/config/cluster.yml"))
+  CONFIG = YAML::load(IO.read("#{CFG_BASE_PATH}/cluster.yml"))
 elsif CHOICES[:config]
   CONFIG = YAML::load(IO.read(CHOICES[:config]))
 else
@@ -118,6 +118,14 @@ class DatabaseOne < ActiveRecord::Base
       self.config['floating_dev']
     else
       "bond0"
+    end
+  end
+
+  def self.master_dev
+    if self.config['master_dev']
+      self.config['master_dev']
+    else
+      self.floating_dev
     end
   end
 
@@ -185,9 +193,9 @@ class DatabaseOne < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -260,6 +268,15 @@ class DatabaseTwo < ActiveRecord::Base
       "bond0"
     end
   end
+  
+  def self.master_dev
+    if self.config['master_dev']
+      self.config['master_dev']
+    else
+      self.floating_dev
+    end
+  end
+
   def self.role
    if self.mysql_rep_role == "master" && self.ip_role == "master"
     "master"
@@ -324,9 +341,9 @@ class DatabaseTwo < ActiveRecord::Base
 
  def self.arping
    if self.config['host'] == `hostname`.chomp
-     `sudo #{self.arping_path} -U -c 4 -I #{slef.floating_dev} #{FLOATING_IP}`
+     `sudo #{self.arping_path} -U -c 4 -I #{slef.master_dev} #{FLOATING_IP}`
    else
-     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.floating_dev} #{FLOATING_IP}'`
+     `ssh #{SSH_OPTIONS} #{self.config['host']} 'sudo #{self.arping_path} -U -c 4 -I #{self.master_dev} #{FLOATING_IP}'`
    end
    if $?.exitstatus == 0
     true
@@ -567,13 +584,13 @@ class MysqlSwitchRoleContext
 
     puts "\nSlave (master-to-be) binlog info:".white
     puts "\nPosition....#{@slave_binlog_position}\nFile....#{@slave_binlog_file}"
-    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='slave', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
+    puts "Copy&Paste Emergency Command....CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='#{@slave.config['username']}', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}\n\n".blue
     @statemachine.promote_slave_to_master
   end
 
   def promote_slave_to_master
     @slave.connection.execute("STOP SLAVE;")
-    if @slave.version =~ /^5.5/
+    if @slave.version =~ /(^5.5|^10.0)/
       @slave.connection.execute("RESET SLAVE ALL;")
     else
       @slave.connection.execute("CHANGE MASTER TO master_host='';")
@@ -613,7 +630,7 @@ class MysqlSwitchRoleContext
   end
 
   def demote_old_master_to_slave
-    change_master_command = "CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='slave', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}"
+    change_master_command = "CHANGE MASTER TO MASTER_HOST='#{@slave.config['host']}', MASTER_PORT=#{@slave.config['port']}, MASTER_USER='#{@slave.config['username']}', MASTER_PASSWORD='#{@slave.config['slave_password']}',MASTER_LOG_FILE='#{@slave_binlog_file}', MASTER_LOG_POS=#{@slave_binlog_position}"
     if @master
       @master.connection.execute(change_master_command)
       @master.connection.execute("START SLAVE")
