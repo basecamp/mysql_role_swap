@@ -12,6 +12,7 @@ database_one:
 #  password: rootpw
   host: 192.168.50.31
   port: 3306
+  slave_user: slave
   slave_password: slavepw
   floating_dev: eth1
 
@@ -22,6 +23,7 @@ database_two:
 #  password: rootpw
   host: 192.168.50.32
   port: 3306
+  slave_user: slave
   slave_password: slavepw
   floating_dev: eth1
 
