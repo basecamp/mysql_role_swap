@@ -1,6 +1,6 @@
 source "https://rubygems.org"
 
-gem 'mysql', '2.8.1'
+gem 'mysql', '2.9.1'
 gem 'activerecord'
 gem 'statemachine'
 gem 'colorize'
