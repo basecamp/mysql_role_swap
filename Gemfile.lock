@@ -1,5 +1,5 @@
 GEM
-  remote: http://rubygems.org/
+  remote: https://rubygems.org/
   specs:
     activemodel (3.2.9)
       activesupport (= 3.2.9)
@@ -20,7 +20,7 @@ GEM
     choice (0.1.6)
     colorize (0.5.8)
     erubis (2.7.0)
-    ffi (1.2.0)
+    ffi (1.14.2)
     i18n (0.6.1)
     json (1.5.4)
     log4r (1.1.10)
