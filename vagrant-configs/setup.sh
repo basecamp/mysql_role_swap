@@ -17,16 +17,19 @@ service iptables stop 2>&1 >> /dev/null
 
 # Install mysql-server if not already installed
 echo "Verifying mysql server is installed..."
-rpm -q --quiet mysql-server || yum install -y mysql-server
+rpm -q --quiet mariadb-server || yum install -y mariadb-server mariadb-devel
+
+echo "Verifying ruby is installed..."
+rpm -q --quiet ruby || yum install -y ruby ruby-devel
 
 # Cleanup any old replication settings
 echo "Cleaning up old mysql instance..."
-service mysqld stop 2>&1 > /dev/null
+systemctl stop mariadb.service 2>&1 > /dev/null
 rm -rf /var/lib/mysql/*
 
 # Start mysqld
 echo "Verifying mysqld is running..."
-service mysqld status 2>&1 >> /dev/null || service mysqld start 2>&1 > /dev/null
+systemctl status mariadb.service 2>&1 >> /dev/null || systemctl start mariadb.service 2>&1 > /dev/null
 
 # MySQL user setup
 echo "Granting remote root access..."
@@ -40,7 +43,7 @@ echo "Granting replication access..."
 if [ ! -L /etc/my.cnf ]; then
   rm -f /etc/my.cnf
   ln -s /vagrant/vagrant-configs/${ROLE}.cnf /etc/my.cnf
-  service mysqld restart
+  systemctl restart mariadb.service 
 fi
 
 # Setup one system to be a slave to start with
