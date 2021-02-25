@@ -10,6 +10,7 @@ require 'active_record'
 require 'statemachine'
 require 'colorize'
 require 'choice'
+require 'yaml'
 
 PROGRAM_VERSION = "0.12"
 
@@ -98,8 +99,7 @@ else
 end
 SSH_OPTIONS = "#{SSH_USERNAME} #{SSH_KEY_FILE}"
 
-
-ActiveRecord::Base.configurations = CONFIG
+ActiveRecord::Base.configurations = CONFIG.except("floating_ip").except("floating_ip_cidr").except("ssh_username").except("ssh_key_file").except("master_ipmi_address")
 
 class DatabaseOne < ActiveRecord::Base
 
