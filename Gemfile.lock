@@ -20,7 +20,7 @@ GEM
     multi_json (1.4.0)
     mysql (2.9.1)
     statemachine (2.0.1)
-    tzinfo (0.3.35)
+    tzinfo (0.3.61)
     vagrant (1.5.0)
 
 PLATFORMS
